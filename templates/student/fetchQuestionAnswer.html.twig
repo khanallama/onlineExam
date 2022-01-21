@@ -17,18 +17,17 @@
             <div class="col-lg-8 d-block m-auto bg-light quizsetting ">
                 <div class="card">
                     <p class="card-header bg-secondary text-center text-uppercase  ">
-                        , You
-                        have to select correct option. Best of Luck.</i> </p>
+                      {{ user.name}}  , You
+                        have to select correct option. Best of Luck.</p>
                 </div>
                 <br>
                 <form method="post" action="{{ path('answerSubmit') }}">
                     <ul  class="list-unstyled">
-
                         {% for questions in question  %}
                             <div class="card">
                                 <br>
                                 <p class="card-header bg-warning"> <b>{{ range('1','100')[loop.index0] }}.{{ questions.question }}</b> </p>
-                                {% for ans in Myanswer[questions.id] %}
+                                {% for ans in answer[questions.id] %}
                                     <div class="card-block">
                                         <ul  class="list-unstyled">
                                             <li><input type="radio" name="answer[{{ questions.id  }}]" value="{{ ans.answerId }}">{{ans.answers }}</li>
@@ -40,11 +39,6 @@
                     </ul>
                     <input type="submit" Value="Submit" class="btn btn-success m-auto d-block" /><br>
                 </form>
-                {% for message in app.flashes('success') %}
-                    <div class="alert alert-success">
-                        {{ message }}
-                    </div>
-                {% endfor %}
             </div>
         </div>
     </div>

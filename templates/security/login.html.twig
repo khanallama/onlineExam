@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Log in!{% endblock %}
+
+{% block body %}
+    <form method="post">
+        <div class="container">
+            <h1 class="text-center"> MCQ Test </h1><br>
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    {% if error %}
+                        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                    {% endif %}
+
+                    {% if app.user %}
+                        <div class="mb-3">
+                            You are logged in as {{ app.user.username }}, <a href="{{ path('app_logout') }}">Logout</a>
+                        </div>
+                    {% endif %}
+                    <div class="card ">
+                        <h4 class="card-header bg-dark text-white text-center">Please Login</h4>
+                        <br>
+                        <div class="form-group">
+                            <label for="inputEmail">Email</label>
+                            <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputPassword">Password</label>
+                            <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+                        </div>
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                        <div class="checkbox mb-3">
+                            <label>
+                                <input type="checkbox" name="_remember_me"> Remember me
+                            </label>
+                        </div>
+                        <button class="btn btn-dark d-block m-auto" type="submit"> Submit </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <a href="{{ path('app_register') }}"><button class="btn btn-dark d-block m-auto mt-3" type="submit">Register</button></a>
+{% endblock %}
