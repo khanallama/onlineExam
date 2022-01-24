@@ -13,8 +13,8 @@ use Symfony\Component\Routing\Annotation\Route;
 class StudentController extends AbstractController
 {
 
-    #[Route('/student', name: 'student')]
-    public function index(): Response
+    #[Route('/studentresult', name: 'studentresult')]
+    public function studentresult(): Response
     {
         $this->denyAccessUnlessGranted('ROLE_STUDENT');
         return $this->render('student/index.html.twig');
@@ -74,6 +74,6 @@ class StudentController extends AbstractController
         }
 
         $this->addFlash('success',"Out of ". $totalQuestions."  you have attempted ".$totalQuestionsAttempt." you have scored ".$score);
-        return $this->redirectToRoute('student');
+        return $this->redirectToRoute('studentresult');
     }
 }
