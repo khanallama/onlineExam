@@ -16,7 +16,7 @@ class StudentController extends AbstractController
     #[Route('/student', name: 'student')]
     public function index(): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $this->denyAccessUnlessGranted('ROLE_STUDENT');
         return $this->render('student/index.html.twig');
     }
 
@@ -31,7 +31,7 @@ class StudentController extends AbstractController
     public function submitAnswer(ManagerRegistry $managerRegistry): Response
     {
         $answers[0] =0 ;
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $this->denyAccessUnlessGranted('ROLE_STUDENT');
         $question = $managerRegistry->getRepository(Question::class)->findAll(); // fetching all data from Question entity.
         foreach ($question as $questions){
             $questionId = $questions->getId(); // fetching questions Id.
@@ -57,7 +57,7 @@ class StudentController extends AbstractController
     #[Route('/answerSubmit', name: 'answerSubmit')]
     public function answerSubmit(ManagerRegistry $registry , Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY'); // deny access the page without login
+        $this->denyAccessUnlessGranted('ROLE_STUDENT'); // deny access the page without login
         $question = $registry->getRepository(Question::class)->findAll(); // fetching all data from Question entity.
         $answer = $request->get('answer'); // caching value from twig form
         $totalQuestions=count($question); // calculating total number of question present in question entity.
