@@ -35,7 +35,7 @@
                 <div class="form-group shadow-textarea">
                 </div>
             </form>
-            </div>
+        </div>
         {% for type, messages in app.session.flashbag.all() %}
             {% for message in messages %}
                 {% if type == 'danger' %}
@@ -49,6 +49,6 @@
                 {% endif %}
             {% endfor %}
         {% endfor %}
-        </div>
+    </div>
     </div>
 {% endblock %}
