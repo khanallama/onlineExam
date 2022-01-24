@@ -15,7 +15,7 @@ class AdminController extends AbstractController
     #[Route('/admin', name: 'admin')]
     public function index(): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         return $this->render('admin/index.html.twig');
     }
 
@@ -28,7 +28,7 @@ class AdminController extends AbstractController
     #[Route('/create',name: 'createQuestionAnswer' , methods:'POST' )]
     public function createQuestionAnswer(ManagerRegistry $doctrine , Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY'); //denying user access who is not login
+        $this->denyAccessUnlessGranted('ROLE_ADMIN'); //denying user access who is not login
 
         $managerRegistry = $doctrine->getManager();
 
