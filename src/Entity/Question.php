@@ -18,11 +18,11 @@ class Question
     #[ORM\Column(type: 'string', length: 255)]
     private $question;
 
-    #[ORM\Column(type: 'integer')]
-    private $correctAnswerId;
-
-    #[ORM\OneToMany(mappedBy: 'questionId', targetEntity: Answer::class)]
+    #[ORM\OneToMany(mappedBy: 'question', targetEntity: Answer::class)]
     private $answers;
+
+    #[ORM\OneToOne(targetEntity: Answer::class)]
+    private $correctAnswer;
 
     public function __construct()
     {
@@ -46,18 +46,6 @@ class Question
         return $this;
     }
 
-    public function getCorrectAnswerId(): ?int
-    {
-        return $this->correctAnswerId;
-    }
-
-    public function setCorrectAnswerId(int $correctAnswerId): self
-    {
-        $this->correctAnswerId = $correctAnswerId;
-
-        return $this;
-    }
-
     /**
      * @return Collection|Answer[]
      */
@@ -70,7 +58,6 @@ class Question
     {
         if (!$this->answers->contains($answer)) {
             $this->answers[] = $answer;
-            $answer->setQuestionId($this);
         }
 
         return $this;
@@ -80,10 +67,19 @@ class Question
     {
         if ($this->answers->removeElement($answer)) {
             // set the owning side to null (unless already changed)
-            if ($answer->getQuestionId() === $this) {
-                $answer->setQuestionId(null);
-            }
         }
+
+        return $this;
+    }
+
+    public function getCorrectAnswer(): ?Answer
+    {
+        return $this->correctAnswer;
+    }
+
+    public function setCorrectAnswer(?Answer $correctAnswer): self
+    {
+        $this->correctAnswer = $correctAnswer;
 
         return $this;
     }

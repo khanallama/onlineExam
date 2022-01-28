@@ -25,46 +25,47 @@ class AdminController extends AbstractController
      * @return Response
      */
 
-    #[Route('/create',name: 'createQuestionAnswer' , methods:'POST' )]
+    #[Route('/create-question',name: 'create_question_answer' , methods:'POST' )]
     public function createQuestionAnswer(ManagerRegistry $doctrine , Request $request): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN'); //denying user access who is not login
 
         $managerRegistry = $doctrine->getManager();
 
-        $question      = $request->get("question");               // geting question from form and initilize it into variable
-        $correctAnswer = $request->get("correctAnswer");         // getting correct answer from form
-        $wrongAnswer1  = $request->get("wronganswer1");         // getting first wrong answer from form
-        $wrongAnswer2  = $request->get("wronganswer2");        // getting second wrong answer from form
-        $wrongAnswer3  = $request->get("wronganswer3");       // getting third wrong answer from form
+        $question      = $request->get("question");
+        $correctAnswer = $request->get("correctAnswer");
+        $wrongAnswer1  = $request->get("wronganswer1");
+        $wrongAnswer2  = $request->get("wronganswer2");
+        $wrongAnswer3  = $request->get("wronganswer3");
 
-        $correctAnswerId = date('His').rand(0,100);         // creating id so that we can pass it itno correct answer's id in answer entity and also pass in question entity to match tha correct answer with question
-
-        $questionsFetch = $doctrine->getRepository(Question::class)->findBy(array('question'=>$question));  // feching question entity to check given question is exist or not
-
-        if ($questionsFetch) {
-            $this->addFlash('danger',"Question Already Present");  // if question exist , it will return  message
+        $questionsFetchDb = $doctrine->getRepository(Question::class)->findBy(array('question'=>$question));
+        if ($questionsFetchDb) {
+            $this->addFlash('danger',"Question Already Present");
             return $this->redirectToRoute('admin');
         }
         else{
-            $questions = new Question();                             // Creating object of Question entity
-            $questions->setQuestion($question);                     // Setting question to the question entity.
-            $questions->setCorrectAnswerId($correctAnswerId);      // Setting correct answer's id to the question in question entity.
-            $managerRegistry->persist($questions);                //  inserting question with it's correct answer id into the database question entity.
+            $questions = new Question();
+            $questions->setQuestion($question);
+            $managerRegistry->persist($questions);
 
-            $answers = [$correctAnswerId => $correctAnswer, rand(0, 20) => $wrongAnswer1, rand(0, 101) => $wrongAnswer2, rand(0, 102) => $wrongAnswer3];   // Assigning corect answewr id to correct answer and random id to other answer which is wrong answer
+            $answer = new Answer();
+            $answer->setAnswers($correctAnswer);
+            $answer->setQuestion($questions);
+            $questions->setCorrectAnswer($answer);
+            $managerRegistry->persist($answer);
 
-            foreach ($answers as $answersId => $answerValue) {
-                $answer = new Answer();               // Creating object of Answer entity
-                $answer->setAnswerId($answersId);    // Setting  correct Answer id to the answer entity with respect to their answer.
-                $answer->setAnswers($answerValue);    // setting answer value
-                $answer->setQuestion($questions);     // setting question object to the answer object ,to set the question Id  with respect to their answers
-                $managerRegistry->persist($answer);   // inserting answers with question id and answer id into the database answer entity
+            $wrongAnswers = [$wrongAnswer1, $wrongAnswer2, $wrongAnswer3];
+
+            foreach ($wrongAnswers as $wrongAnswer) {
+                $answer = new Answer();
+                $answer->setAnswers($wrongAnswer);
+                $answer->setQuestion($questions);
+                $managerRegistry->persist($answer);
             }
-            $managerRegistry->flush();               // Synchronizing all data to database.
+            $managerRegistry->flush();
 
             $this->addFlash('success',"Question and Answers added");
-            return $this->render('admin/index.html.twig');
+            return $this->redirectToRoute('admin');
         }
     }
 }

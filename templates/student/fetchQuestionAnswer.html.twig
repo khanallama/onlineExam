@@ -17,27 +17,33 @@
             <div class="col-lg-8 d-block m-auto bg-light quizsetting ">
                 <div class="card">
                     <p class="card-header bg-secondary text-center text-uppercase  ">
-                      {{ user.name}}  , You
+                        {% if questions == true %}
+                      {{ app.user.name}}  , You
                         have to select correct option. Best of Luck.</p>
+                    {% else %}
+                        No Questions Answer!
+                    {% endif %}
                 </div>
                 <br>
-                <form method="post" action="{{ path('answerSubmit') }}">
+                <form method="post" action="{{ path('test_submit') }}">
                     <ul  class="list-unstyled">
-                        {% for questions in question  %}
+                        {% for question in questions  %}
+                           <input type="hidden" value="{{ questions|length }}" name="total_questions">
                             <div class="card">
-                                <br>
-                                <p class="card-header bg-warning"> <b>{{ range('1','100')[loop.index0] }}.{{ questions.question }}</b> </p>
-                                {% for ans in answer[questions.id] %}
+                                <p class="card-header bg-warning"> <b>{{ range('1','100')[loop.index0] }}.{{ question.question }}</b> </p>
+                                {% for answer in answers[question.id] %}
                                     <div class="card-block">
                                         <ul  class="list-unstyled">
-                                            <li><input type="radio" name="answer[{{ questions.id  }}]" value="{{ ans.answerId }}">{{ans.answers }}</li>
+                                            <li><input type="radio" name="answer[{{ question.id  }}]" value="{{ answer.Id }}">{{answer.answers }}</li>
                                         </ul>
                                     </div>
                                 {% endfor %}
                             </div>
                         {% endfor %}
                     </ul>
+                    {% if questions == true %}
                     <input type="submit" Value="Submit" class="btn btn-success m-auto d-block" /><br>
+                    {% endif %}
                 </form>
             </div>
         </div>

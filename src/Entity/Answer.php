@@ -20,9 +20,6 @@ class Answer
     #[ORM\JoinColumn(nullable: false)]
     private $question;
 
-    #[ORM\Column(type: 'integer')]
-    private $answerId;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -52,15 +49,4 @@ class Answer
         return $this;
     }
 
-    public function getAnswerId(): ?int
-    {
-        return $this->answerId;
-    }
-
-    public function setAnswerId(int $answerId): self
-    {
-        $this->answerId = $answerId;
-
-        return $this;
-    }
 }

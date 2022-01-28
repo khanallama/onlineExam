@@ -13,8 +13,8 @@ use Symfony\Component\Routing\Annotation\Route;
 class StudentController extends AbstractController
 {
 
-    #[Route('/studentresult', name: 'studentresult')]
-    public function studentresult(): Response
+    #[Route('/test-result', name: 'test_result')]
+    public function testResult(): Response
     {
         $this->denyAccessUnlessGranted('ROLE_STUDENT');
         return $this->render('student/index.html.twig');
@@ -27,21 +27,20 @@ class StudentController extends AbstractController
      * fetching questions and it's related answer from database and render all the data to twig file.
      */
 
-    #[Route('/fetchQuestionAnswer', name: 'fetchQuestionAnswer')]
+    #[Route('/mcq-test', name: 'mcq_test')]
     public function submitAnswer(ManagerRegistry $managerRegistry): Response
     {
-        $answers[0] =0 ;
+        $answers = [];
         $this->denyAccessUnlessGranted('ROLE_STUDENT');
-        $question = $managerRegistry->getRepository(Question::class)->findAll(); // fetching all data from Question entity.
-        foreach ($question as $questions){
-            $questionId = $questions->getId(); // fetching questions Id.
-            $answers[$questionId]= $managerRegistry->getRepository(Answer::class)->findBy(array('question'=>$questionId)); // fetching answers with respect to their questons id.
+        $questions = $managerRegistry->getRepository(Question::class)->findAll(); // fetching all data from Question entity.
+        foreach ($questions as $question){
+            $questionId = $question->getId();
+            $answers[$questionId] = $managerRegistry->getRepository(Answer::class)->findBy(array('question'=>$questionId)); // fetching answers with respect to their questons id.
         }
-        $userName = $this->getUser();
+
         return $this->render('student/fetchQuestionAnswer.html.twig',[
-            'question' => $question,
-            'answer' => $answers,
-            'user'     => $userName,
+            'questions' => $questions,
+            'answers' => $answers,
         ]);
 
     }
@@ -54,26 +53,29 @@ class StudentController extends AbstractController
      * catching data from twig file.
      */
 
-    #[Route('/answerSubmit', name: 'answerSubmit')]
-    public function answerSubmit(ManagerRegistry $registry , Request $request): Response
+    #[Route('/test-submit', name: 'test_submit')]
+    public function testSubmit(ManagerRegistry $registry , Request $request): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_STUDENT'); // deny access the page without login
-        $question = $registry->getRepository(Question::class)->findAll(); // fetching all data from Question entity.
-        $answer = $request->get('answer'); // caching value from twig form
-        $totalQuestions=count($question); // calculating total number of question present in question entity.
-        $totalQuestionsAttempt=count($answer); //  calculating total number of question attempt.
-        $score=0;
+        $this->denyAccessUnlessGranted('ROLE_STUDENT');
+        $questions = $registry->getRepository(Question::class)->findAll();
+        $chosenAnswers = $request->get('answer');
+        $totalQuestions = $request->get('total_questions');
 
-        foreach ($answer as $answers){
-            foreach ($question as $questions){
-                $questionId = $questions->getCorrectAnswerId();
-                if($questionId == $answers){
+        $totalQuestionsAttempt = count($chosenAnswers);
+        $score = 0;
+
+        foreach ($chosenAnswers as $answer){
+            foreach ($questions as $question){
+                $correctAnswerId = $question->getCorrectAnswer()->getId();
+                if($correctAnswerId == $answer){
                     $score++;
                 }
             }
         }
 
         $this->addFlash('success',"Out of ". $totalQuestions."  you have attempted ".$totalQuestionsAttempt." you have scored ".$score);
-        return $this->redirectToRoute('studentresult');
+        return $this->redirectToRoute('test_result');
     }
+
 }
+
